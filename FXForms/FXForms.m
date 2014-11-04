@@ -3268,6 +3268,7 @@ static void FXFormPreprocessFieldDictionary(NSMutableDictionary *dictionary)
 @interface FXFormDatePickerCell ()
 
 @property (nonatomic, strong) UIDatePicker *datePicker;
+@property (nonatomic, strong) UIColor *detailTextLabelColor;
 
 @end
 
@@ -3284,6 +3285,7 @@ static void FXFormPreprocessFieldDictionary(NSMutableDictionary *dictionary)
 {
     self.textLabel.text = self.field.title;
     self.detailTextLabel.text = [self.field fieldDescription] ?: [self.field.placeholder fieldDescription];
+    _detailTextLabelColor = self.detailTextLabel.textColor;
     
     if ([self.field.type isEqualToString:FXFormFieldTypeDate])
     {
@@ -3297,6 +3299,7 @@ static void FXFormPreprocessFieldDictionary(NSMutableDictionary *dictionary)
     {
         self.datePicker.datePickerMode = UIDatePickerModeDateAndTime;
     }
+    
     
     self.datePicker.date = self.field.value ?: ([self.field.placeholder isKindOfClass:[NSDate class]]? self.field.placeholder: [NSDate date]);
 }
@@ -3322,7 +3325,13 @@ static void FXFormPreprocessFieldDictionary(NSMutableDictionary *dictionary)
 
 - (void)didSelectWithTableView:(UITableView *)tableView controller:(__unused UIViewController *)controller
 {
-    [self becomeFirstResponder];
+    if (self.isFirstResponder) {
+        [self resignFirstResponder];
+        self.detailTextLabel.textColor = _detailTextLabelColor;
+    } else {
+        [self becomeFirstResponder];
+        self.detailTextLabel.textColor = UIColor.redColor;
+    }
     [tableView deselectRowAtIndexPath:tableView.indexPathForSelectedRow animated:YES];
 }
 
